@@ -1,0 +1,17 @@
+{
+	"name": "ls_SqlServer1",
+	"type": "Microsoft.Synapse/workspaces/linkedservices",
+	"properties": {
+		"annotations": [],
+		"type": "SqlServer",
+		"typeProperties": {
+			"connectionString": "integrated security=True;data source=DESKTOP-P24AOKF\\SQLEXPRESS01;initial catalog=db_b9_supplychain",
+			"userName": "DESKTOP-P24AOKF\\ChandanS",
+			"encryptedCredential": "eyJDcmVkZW50aWFsSWQiOiI4ZDEyZTQxZi02YjYyLTQxMWItOGZmOC01MDUxOGJlMjk0MDAiLCJWZXJzaW9uIjoiMi4wIiwiQ2xhc3NUeXBlIjoiTWljcm9zb2Z0LkRhdGFQcm94eS5Db3JlLkludGVyU2VydmljZURhdGFDb250cmFjdC5DcmVkZW50aWFsU1UwNkNZMTQifQ=="
+		},
+		"connectVia": {
+			"referenceName": "SelfHosted-IntegrationRuntime1",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}
