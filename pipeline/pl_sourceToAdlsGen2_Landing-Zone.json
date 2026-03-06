@@ -17,7 +17,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderQuery": "SELECT SourceSchemaName\n\t,SourceTableName\n\t,SourceQuery + CASE \n\t\tWHEN LastWatermarkValue IS NULL\n\t\t\tAND WatermarkDataType = 'DATETIME'\n\t\t\tTHEN '01/01/1900'\n\t\tWHEN LastWatermarkValue IS NULL\n\t\t\tAND WatermarkDataType = 'INT'\n\t\t\tTHEN '0'\n\t\tWHEN LastWatermarkValue IS NULL\n\t\t\tAND WatermarkDataType = 'N/A'\n\t\t\tTHEN ''\n\t\tELSE LastWatermarkValue\n\t\tEND AS SourceQuery,\n\t\tSourceName,\n\t\tSourceServer,\n\t\tSourceDatabaseName\nFROM [IncrementalLoadMetadata] where IsActive = 'True'",
+						"sqlReaderQuery": "SELECT \n    SourceSchemaName,\n    SourceTableName,\n    ISNULL(SourceQuery,'') +\n    ISNULL(\n        CASE \n            WHEN WatermarkDataType = 'DATETIME'\n                THEN ISNULL(LastWatermarkValue,'01/01/1900')\n            WHEN WatermarkDataType = 'INT'\n                THEN ISNULL(LastWatermarkValue,'0')\n            ELSE ISNULL(LastWatermarkValue,'')\n        END,''\n    ) AS SourceQuery,\n    SourceName,\n    SourceServer,\n    SourceDatabaseName\nFROM IncrementalLoadMetadata\nWHERE IsActive = 'True';",
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
@@ -46,7 +46,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"items": {
-						"value": "@activity('Copy data1').output.value",
+						"value": "@activity('Lookup1').output,value",
 						"type": "Expression"
 					},
 					"activities": [
@@ -103,7 +103,7 @@
 											"type": "Expression"
 										},
 										"DBName": {
-											"value": "@item().SourceDatabaseName",
+											"value": "@item().SourceDBUserName",
 											"type": "Expression"
 										},
 										"DBUserName": {
