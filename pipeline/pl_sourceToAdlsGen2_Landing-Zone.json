@@ -223,7 +223,7 @@
 						{
 							"type": "Query",
 							"text": {
-								"value": "UPDATE [dbo].[IncrementalLoadMetadata] set LastWatermarkValue='@{activity('Get Max Date').output.firstRow.Maxflights_id}'\nwhere [SourceName] = 'OnPremSQLServer' and SourceTableName = 'flights_raw';\n\nUPDATE [dbo].[IncrementalLoadMetadata] set LastWatermarkValue='@{activity('Get Max Date').output.firstRow.Maxbooking_id}'\nwhere [SourceName] = 'OnPremSQLServer' and SourceTableName = 'bookings_raw';",
+								"value": "UPDATE [dbo].[IncrementalLoadMetadata] set LastWatermarkValue='@{activity('Get Max Date').output.firstRow.Maxflights_raw}'\nwhere [SourceName] = 'OnPremSQLServer' and SourceTableName = 'flights_raw';\n\nUPDATE [dbo].[IncrementalLoadMetadata] set LastWatermarkValue='@{activity('Get Max Date').output.firstRow.Maxbooking_raw}'\nwhere [SourceName] = 'OnPremSQLServer' and SourceTableName = 'bookings_raw';",
 								"type": "Expression"
 							}
 						}
