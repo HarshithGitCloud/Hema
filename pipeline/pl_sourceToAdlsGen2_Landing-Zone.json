@@ -17,7 +17,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderQuery": "SELECT \n    SourceSchemaName,\n    SourceTableName,\n    ISNULL(SourceQuery,'') +\n    ISNULL(\n        CASE \n            WHEN WatermarkDataType = 'DATETIME'\n                THEN ISNULL(LastWatermarkValue,'01/01/1900')\n            WHEN WatermarkDataType = 'INT'\n                THEN ISNULL(LastWatermarkValue,'0')\n            ELSE ISNULL(LastWatermarkValue,'')\n        END,''\n    ) AS SourceQuery,\n    SourceName,\n    SourceServer,\n    SourceDatabaseName,\n    SourceDBUserName\nFROM IncrementalLoadMetadata\nWHERE IsActive = 'True';",
+						"sqlReaderQuery": "SELECT \n    SourceSchemaName,\n    SourceTableName,\n    ISNULL(SourceQuery,'') +\n    ISNULL(\n        CASE \n            WHEN WatermarkDataType = 'DATETIME'\n                THEN ISNULL(LastWatermarkValue,'01/01/1900')\n            WHEN WatermarkDataType = 'INT'\n                THEN ISNULL(LastWatermarkValue,'0')\n            ELSE ISNULL(LastWatermarkValue,'')\n        END,''\n    ) AS SourceQuery,\n    SourceName,\n    SourceServer,\n    SourceDatabaseName,\n    SourceDBUserName\nFROM IncrementalLoadMetadata\nWHERE IsActive = 'False';",
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
