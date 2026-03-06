@@ -159,7 +159,7 @@
 							"SourceDBUserName": "ChandanS"
 						}
 					},
-					"firstRowOnly": false
+					"firstRowOnly": true
 				}
 			},
 			{
