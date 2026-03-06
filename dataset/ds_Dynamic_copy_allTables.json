@@ -10,7 +10,7 @@
 					"type": "Expression"
 				},
 				"DBName": {
-					"value": "@dataset().SourceDataBaseName",
+					"value": "@dataset().SourceDatabaseName",
 					"type": "Expression"
 				},
 				"DBUserName": {
