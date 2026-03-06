@@ -17,7 +17,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderQuery": "SELECT SourceSchemaName\n\t,SourceTableName\n\t,SourceQuery + CASE \n\t\tWHEN LastWatermarkValue IS NULL\n\t\t\tAND WatermarkDataType = 'DATETIME'\n\t\t\tTHEN '01/01/1900'\n\t\tWHEN LastWatermarkValue IS NULL\n\t\t\tAND WatermarkDataType = 'INT'\n\t\t\tTHEN '0'\n\t\tWHEN LastWatermarkValue IS NULL\n\t\t\tAND WatermarkDataType = 'N/A'\n\t\t\tTHEN ''\n\t\tELSE LastWatermarkValue\n\t\tEND AS SourceQuery,\n\t\tSourceName\nFROM [IncrementalLoadMetadata] where IsActive = 'True'",
+						"sqlReaderQuery": "SELECT SourceSchemaName\n\t,SourceTableName\n\t,SourceQuery + CASE \n\t\tWHEN LastWatermarkValue IS NULL\n\t\t\tAND WatermarkDataType = 'DATETIME'\n\t\t\tTHEN '01/01/1900'\n\t\tWHEN LastWatermarkValue IS NULL\n\t\t\tAND WatermarkDataType = 'INT'\n\t\t\tTHEN '0'\n\t\tWHEN LastWatermarkValue IS NULL\n\t\t\tAND WatermarkDataType = 'N/A'\n\t\t\tTHEN ''\n\t\tELSE LastWatermarkValue\n\t\tEND AS SourceQuery,\n\t\tSourceName,\n\t\tSourceServer,\n\t\tSourceDBUserName\nFROM [IncrementalLoadMetadata] where IsActive = 'True'",
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
@@ -107,7 +107,7 @@
 											"type": "Expression"
 										},
 										"DBUserName": {
-											"value": "@item().SourceDBUserName",
+											"value": "@item().SourceDatabaseName",
 											"type": "Expression"
 										}
 									}
