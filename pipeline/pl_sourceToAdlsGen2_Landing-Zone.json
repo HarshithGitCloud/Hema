@@ -46,7 +46,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"items": {
-						"value": "@activity('Lookup1').output,value",
+						"value": "@activity('Lookup1').output.value",
 						"type": "Expression"
 					},
 					"isSequential": true,
@@ -74,23 +74,15 @@
 									"partitionOption": "None"
 								},
 								"sink": {
-									"type": "ParquetSink",
+									"type": "JsonSink",
 									"storeSettings": {
 										"type": "AzureBlobFSWriteSettings"
 									},
 									"formatSettings": {
-										"type": "ParquetWriteSettings"
+										"type": "JsonWriteSettings"
 									}
 								},
-								"enableStaging": false,
-								"translator": {
-									"type": "TabularTranslator",
-									"typeConversion": true,
-									"typeConversionSettings": {
-										"allowDataTruncation": true,
-										"treatBooleanAsNumber": false
-									}
-								}
+								"enableStaging": false
 							},
 							"inputs": [
 								{
@@ -114,18 +106,8 @@
 							],
 							"outputs": [
 								{
-									"referenceName": "ds_Parquet1",
-									"type": "DatasetReference",
-									"parameters": {
-										"Directory": {
-											"value": "@concat('staging/',item().SourceName,'/temParquet/')",
-											"type": "Expression"
-										},
-										"FileName": {
-											"value": "@concat(item().SourceTableName,'.parquet')",
-											"type": "Expression"
-										}
-									}
+									"referenceName": "Json1",
+									"type": "DatasetReference"
 								}
 							]
 						}
