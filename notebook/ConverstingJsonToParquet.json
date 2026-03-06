@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "daaf37f9-a7f8-41ae-b402-2255adb4aeda"
+				"spark.autotune.trackingId": "9f9f0ac4-718b-464d-9a53-50d805abc6af"
 			}
 		},
 		"metadata": {
@@ -51,20 +51,26 @@
 			{
 				"cell_type": "code",
 				"source": [
-					"files = [\"flights_raw\",\"bookings_raw\",\"airports_raw\"]\n",
+					"storage_account = \"sadevenvdatamart\"  \n",
+					"container = \"adlsgen2\"\n",
+					"\n",
+					"source_folder = \"/staging/OnPremSQLServer/tempjson/\"\n",
+					"target_folder = \"/staging/OnPremSQLServer/parquet/\"\n",
+					"\n",
+					"files = [\"flights_raw\",\"bookings_raw\"]\n",
 					"\n",
 					"for file in files:\n",
-					"    \n",
-					"    json_path = f\"abfss://container@storageaccount.dfs.core.windows.net/staging/OnPremSQLServer/tempjson/{file}.json\"\n",
-					"    parquet_path = f\"abfss://container@storageaccount.dfs.core.windows.net/staging/OnPremSQLServer/parquet/{file}\"\n",
-					"    \n",
-					"    df = spark.read.json(json_path)\n",
-					"    \n",
+					"\n",
+					"    json_path = f\"abfss://{container}@{storage_account}.dfs.core.windows.net/{source_folder}{file}.json\"\n",
+					"    parquet_path = f\"abfss://{container}@{storage_account}.dfs.core.windows.net/{target_folder}{file}\"\n",
+					"\n",
+					"    df = spark.read.option(\"multiline\",\"false\").json(json_path)\n",
+					"\n",
 					"    df.write.mode(\"overwrite\").parquet(parquet_path)\n",
-					"    \n",
-					"    print(f\"{file} converted to parquet\")"
+					"\n",
+					"    print(f\"{file} converted to parquet successfully\")"
 				],
-				"execution_count": 2
+				"execution_count": 5
 			}
 		]
 	}
