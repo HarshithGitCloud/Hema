@@ -5,6 +5,8 @@
 			{
 				"name": "GetMetadata",
 				"type": "Lookup",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
@@ -35,6 +37,8 @@
 			{
 				"name": "LoadDataToLanding",
 				"type": "ForEach",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "GetMetadata",
@@ -165,6 +169,8 @@
 			{
 				"name": "ConvetJsonToParquet",
 				"type": "SynapseNotebook",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Get Max Date",
