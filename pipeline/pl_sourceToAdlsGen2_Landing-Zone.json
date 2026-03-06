@@ -261,7 +261,8 @@
 									"referenceName": "ds_dynamic_source_landing",
 									"type": "DatasetReference",
 									"parameters": {
-										"Directory": "\"/staging/OnPremSQLServer/tempjson/\""
+										"Directory": "\"/staging/OnPremSQLServer/tempjson/\"",
+										"FileName": "1"
 									}
 								}
 							],
@@ -270,7 +271,8 @@
 									"referenceName": "ds_dynamic_source_landing",
 									"type": "DatasetReference",
 									"parameters": {
-										"Directory": "\"/staging/OnPremSQLServer/parquet/\""
+										"Directory": "\"/staging/OnPremSQLServer/parquet/\"",
+										"FileName": "1"
 									}
 								}
 							]
