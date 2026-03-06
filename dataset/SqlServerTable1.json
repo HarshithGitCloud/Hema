@@ -5,9 +5,29 @@
 			"referenceName": "ls_SqlServer1_OnPrem",
 			"type": "LinkedServiceReference",
 			"parameters": {
-				"ServerName": "DESKTOP-P24AOKF\\SQLEXPRESS01",
-				"DBName": "db_flight_march_03_2026",
-				"DBUserName": "ChandanS"
+				"ServerName": {
+					"value": "@dataset().SchemaName",
+					"type": "Expression"
+				},
+				"DBName": {
+					"value": "@dataset().DBName",
+					"type": "Expression"
+				},
+				"DBUserName": {
+					"value": "@dataset().DBUserName",
+					"type": "Expression"
+				}
+			}
+		},
+		"parameters": {
+			"SchemaName": {
+				"type": "string"
+			},
+			"DBName": {
+				"type": "string"
+			},
+			"DBUserName": {
+				"type": "string"
 			}
 		},
 		"annotations": [],
