@@ -65,6 +65,10 @@
 							"typeProperties": {
 								"source": {
 									"type": "SqlServerSource",
+									"sqlReaderQuery": {
+										"value": "@item().SourceQuery",
+										"type": "Expression"
+									},
 									"queryTimeout": "02:00:00",
 									"partitionOption": "None"
 								},
@@ -73,7 +77,21 @@
 							"inputs": [
 								{
 									"referenceName": "SqlServerTable1",
-									"type": "DatasetReference"
+									"type": "DatasetReference",
+									"parameters": {
+										"SchemaName": {
+											"value": "@item().SourceServer",
+											"type": "Expression"
+										},
+										"DBName": {
+											"value": "@item().SourceDatabaseName",
+											"type": "Expression"
+										},
+										"DBUserName": {
+											"value": "@item().SourceDBUserName",
+											"type": "Expression"
+										}
+									}
 								}
 							]
 						}
