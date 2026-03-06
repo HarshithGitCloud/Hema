@@ -146,7 +146,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "SqlServerSource",
-						"sqlReaderQuery": "SELECT \r\n(\r\nSELECT 'F' + CAST(MAX(CAST(REPLACE(flight_id,'F','') AS INT)) AS VARCHAR)\r\nFROM dbo.flights_raw\r\n) AS MaxFlights_id;\r\n\r\nSELECT \r\n(\r\nSELECT 'F' + CAST(MAX(CAST(REPLACE(flight_id,'F','') AS INT)) AS VARCHAR)\r\nFROM dbo.bookings_raw\r\n) AS MaxBookings_id;",
+						"sqlReaderQuery": "SELECT \r\n(SELECT 'F' + CAST(MAX(CAST(SUBSTRING(flight_id,2,LEN(flight_id)) AS INT)) AS VARCHAR)\r\n FROM dbo.flights_raw) AS Maxflights_id,\r\n\r\n(SELECT 'B' + CAST(MAX(CAST(SUBSTRING(booking_id,2,LEN(booking_id)) AS INT)) AS VARCHAR)\r\n FROM dbo.bookings_raw) AS Maxbooking_id;",
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
@@ -159,7 +159,7 @@
 							"SourceDBUserName": "ChandanS"
 						}
 					},
-					"firstRowOnly": true
+					"firstRowOnly": false
 				}
 			},
 			{
@@ -223,7 +223,7 @@
 						{
 							"type": "Query",
 							"text": {
-								"value": "UPDATE [dbo].[IncrementalLoadMetadata] set LastWatermarkValue='@{activity('Get Max Date').output.firstRow.MaxFlights_id}'\nwhere [SourceName] = 'OnPremSQLServer' and SourceTableName = 'flights_raw';\n\nUPDATE [dbo].[IncrementalLoadMetadata] set LastWatermarkValue='@{activity('Get Max Date').output.firstRow.MaxBookings_id}'\nwhere [SourceName] = 'OnPremSQLServer' and SourceTableName = 'bookings_raw';",
+								"value": "UPDATE [dbo].[IncrementalLoadMetadata] set LastWatermarkValue='@{activity('Get Max Date').output.firstRow.Maxflights_id}'\nwhere [SourceName] = 'OnPremSQLServer' and SourceTableName = 'flights_raw';\n\nUPDATE [dbo].[IncrementalLoadMetadata] set LastWatermarkValue='@{activity('Get Max Date').output.firstRow.Maxbooking_id}'\nwhere [SourceName] = 'OnPremSQLServer' and SourceTableName = 'bookings_raw';",
 								"type": "Expression"
 							}
 						}
@@ -255,7 +255,17 @@
 						"referenceName": "ds_dynamic_source_landing",
 						"type": "DatasetReference",
 						"parameters": {
-							"Directory": "\"staging/OnPremSQLServer/tempjson/\""
+							"Directory": "\"staging/OnPremSQLServer/tempjson/\"",
+							"FileName": {
+								"value": "'.json'",
+								"type": "Expression"
+							}
+						}
+					},
+					"logStorageSettings": {
+						"linkedServiceName": {
+							"referenceName": "ls_AdlGen2",
+							"type": "LinkedServiceReference"
 						}
 					},
 					"enableLogging": true,
