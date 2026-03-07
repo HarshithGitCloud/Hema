@@ -112,6 +112,10 @@
 										"Directory": {
 											"value": "@concat('staging/',item().SourceName,'/tempjson/')",
 											"type": "Expression"
+										},
+										"FileName": {
+											"value": "@concat(item().SourceTableName,'.json')",
+											"type": "Expression"
 										}
 									}
 								}
