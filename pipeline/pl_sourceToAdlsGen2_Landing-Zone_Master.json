@@ -165,8 +165,6 @@
 			{
 				"name": "ConvetJsonToParquet",
 				"type": "SynapseNotebook",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Get Max Date",
@@ -259,7 +257,7 @@
 						"parameters": {
 							"Directory": "\"staging/OnPremSQLServer/tempjson/\"",
 							"FileName": {
-								"value": "\".json\"",
+								"value": ".json",
 								"type": "Expression"
 							}
 						}
