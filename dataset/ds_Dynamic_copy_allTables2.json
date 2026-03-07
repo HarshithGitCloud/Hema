@@ -1,0 +1,37 @@
+{
+	"name": "ds_Dynamic_copy_allTables2",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_SqlServer1_OnPrem",
+			"type": "LinkedServiceReference",
+			"parameters": {
+				"ServerName": {
+					"value": "@dataset().SourceServer",
+					"type": "Expression"
+				},
+				"DBName": {
+					"value": "@dataset().SourceDatabaseName",
+					"type": "Expression"
+				},
+				"DBUserName": {
+					"value": "@dataset().SourceDBUserName",
+					"type": "Expression"
+				}
+			}
+		},
+		"parameters": {
+			"SourceServer": {
+				"type": "string"
+			},
+			"SourceDataBaseName": {
+				"type": "string"
+			},
+			"SourceDBUserName": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "SqlServerTable",
+		"schema": []
+	}
+}
