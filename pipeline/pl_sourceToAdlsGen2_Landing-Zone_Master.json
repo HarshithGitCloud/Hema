@@ -107,7 +107,13 @@
 							"outputs": [
 								{
 									"referenceName": "Json1",
-									"type": "DatasetReference"
+									"type": "DatasetReference",
+									"parameters": {
+										"Directory": {
+											"value": "@concat('staging/',item().SourceName,'/tempjson/')",
+											"type": "Expression"
+										}
+									}
 								}
 							]
 						}
