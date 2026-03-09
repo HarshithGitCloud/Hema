@@ -5,8 +5,6 @@
 			{
 				"name": "GetMetadata",
 				"type": "Lookup",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
@@ -38,8 +36,6 @@
 				"name": "ForEach1",
 				"description": "LoadingData",
 				"type": "ForEach",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "GetMetadata",
@@ -132,8 +128,6 @@
 			{
 				"name": "Get Max Date",
 				"type": "Lookup",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "ForEach1",
@@ -172,8 +166,6 @@
 			{
 				"name": "ConvetJsonToParquet",
 				"type": "SynapseNotebook",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Get Max Date",
@@ -191,10 +183,6 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"notebook": {
-						"referenceName": "ConverstingJsonToParquet2",
-						"type": "NotebookReference"
-					},
 					"snapshot": true,
 					"conf": {
 						"spark.dynamicAllocation.enabled": null,
@@ -207,8 +195,6 @@
 			{
 				"name": "Script1",
 				"type": "Script",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "ConvetJsonToParquet",
@@ -245,8 +231,6 @@
 			{
 				"name": "Delete1",
 				"type": "Delete",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Script1",
