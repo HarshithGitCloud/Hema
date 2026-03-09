@@ -1,5 +1,5 @@
 {
-	"name": "nb_cleaning_rawtoPreIntergration",
+	"name": "nb_cleaning_rawPInt_Silver_flights_raw",
 	"properties": {
 		"nbformat": 4,
 		"nbformat_minor": 2,
@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "f5b05367-df35-4659-a661-c3172e578bf8"
+				"spark.autotune.trackingId": "ba2d5e24-05b2-4981-a3ae-909dd4c72615"
 			}
 		},
 		"metadata": {
@@ -25,7 +25,7 @@
 			"enableDebugMode": false,
 			"kernelspec": {
 				"name": "synapse_pyspark",
-				"display_name": "python"
+				"display_name": "Synapse PySpark"
 			},
 			"language_info": {
 				"name": "python"
@@ -49,14 +49,209 @@
 		},
 		"cells": [
 			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"want to perform data cleaning + auditing + load to Silver/PreIntegration layer in Spark (Synapse/Databricks style).\n",
+					"Based on your requirements:\n",
+					"\n",
+					"✔ Handle NULL flight_number\n",
+					"✔ Fix incorrect date formats (departure_time, arrival_time)\n",
+					"✔ Add audit column (ingestion_date)\n",
+					"✔ Store into Silver / PreIntegration layer\n",
+					"\n",
+					"Data Engineering Notebook that includes:\n",
+					"\n",
+					"Bad record handling\n",
+					"\n",
+					"Quarantine table\n",
+					"\n",
+					"Data quality checks\n",
+					"\n",
+					"Delta Lake silver tables"
+				]
+			},
+			{
 				"cell_type": "code",
 				"source": [
-					"storage_account = \"sadevenvdatamart\"  \n",
+					"# #testing\n",
+					"\n",
+					"# storage_account = \"sadevenvdatamart\"\n",
+					"# container = \"adlsgen2\"\n",
+					"\n",
+					"# source_folder = \"staging/OnPremSQLServer/parquet/flights_raw.parquet\"\n",
+					"\n",
+					"# parquet_path = f\"abfss://{container}@{storage_account}.dfs.core.windows.net/{source_folder}\"\n",
+					"\n",
+					"# df = spark.read.format(\"parquet\").load(parquet_path)\n",
+					"\n",
+					"# df.show() "
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"want to perform data cleaning + auditing + load to Silver/PreIntegration layer in Spark (Synapse/Databricks style).\n",
+					"\n",
+					"✔ Handle NULL flight_number\n",
+					"✔ Fix incorrect date formats (departure_time, arrival_time)\n",
+					"✔ Add audit column (ingestion_date)\n",
+					"✔ Store into Silver / PreIntegration layer"
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"collapsed": false
+				},
+				"source": [
+					"from pyspark.sql.functions import *\n",
+					"from pyspark.sql.types import *\n",
+					"\n",
+					"storage_account = \"sadevenvdatamart\"\n",
 					"container = \"adlsgen2\"\n",
 					"\n",
-					"target_folder = \"/staging/OnPremSQLServer/parquet/\"\n",
+					"source_folder = \"staging/OnPremSQLServer/parquet/flights_raw.parquet\"\n",
+					"bronze_path = f\"abfss://{container}@{storage_account}.dfs.core.windows.net/staging/OnPremSQLServer/parquet/flights_raw.parquet\"\n",
 					"\n",
-					" parquet_path = f\"abfss://{container}@{storage_account}.dfs.core.windows.net/{target_folder}{file}\""
+					"df = spark.read.format(\"parquet\").load(bronze_path)\n",
+					"display(df)"
+				],
+				"execution_count": 38
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"from pyspark.sql.functions import col, coalesce, to_timestamp\n",
+					"\n",
+					"df_clean = df.withColumn(\n",
+					"    \"departure_time\",\n",
+					"    coalesce(\n",
+					"        to_timestamp(col(\"departure_time\"), \"dd-MM-yy hh:mma\"),\n",
+					"        to_timestamp(col(\"departure_time\"), \"dd-MM-yy HH:mm\"),\n",
+					"        to_timestamp(col(\"departure_time\"), \"dd-MM-yyyy HH:mm\"),\n",
+					"        to_timestamp(col(\"departure_time\"), \"d MMM yy HH:mm\"),\n",
+					"        to_timestamp(col(\"departure_time\"), \"dd MMM yy HH:mm\"),\n",
+					"        to_timestamp(col(\"departure_time\"), \"dd/MM/yyyy HH:mm\")\n",
+					"    )\n",
+					")\n",
+					"\n",
+					"df_clean = df_clean.withColumn(\n",
+					"    \"arrival_time\",\n",
+					"    coalesce(\n",
+					"        to_timestamp(col(\"arrival_time\"), \"dd-MM-yy hh:mma\"),\n",
+					"        to_timestamp(col(\"arrival_time\"), \"dd-MM-yy HH:mm\"),\n",
+					"        to_timestamp(col(\"arrival_time\"), \"dd-MM-yyyy HH:mm\"),\n",
+					"        to_timestamp(col(\"arrival_time\"), \"d MMM yy HH:mm\"),\n",
+					"        to_timestamp(col(\"arrival_time\"), \"dd MMM yy HH:mm\"),\n",
+					"        to_timestamp(col(\"arrival_time\"), \"dd/MM/yyyy HH:mm\")\n",
+					"    )\n",
+					")"
+				],
+				"execution_count": 40
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"from pyspark.sql.functions import col, when, trim, lower, to_timestamp, current_timestamp\n",
+					"\n",
+					"# Paths\n",
+					"silver_path = f\"abfss://{container}@{storage_account}.dfs.core.windows.net/preintegration/flights\"\n",
+					"bronze_error_path = f\"abfss://{container}@{storage_account}.dfs.core.windows.net/bronze_error/flights\"\n",
+					"\n",
+					"# Convert datetime format for validation\n",
+					"df_checked = df_clean \\\n",
+					".withColumn(\"departure_ts\", to_timestamp(col(\"departure_time\"), \"yyyy-MM-dd HH:mm:ss\")) \\\n",
+					".withColumn(\"arrival_ts\", to_timestamp(col(\"arrival_time\"), \"yyyy-MM-dd HH:mm:ss\"))\n",
+					"\n",
+					"# Add validation logic\n",
+					"df_with_error = df_checked.withColumn(\n",
+					"    \"error_reason\",\n",
+					"    \n",
+					"    when(col(\"flight_id\").isNull() | (trim(col(\"flight_id\")) == \"\") | (lower(col(\"flight_id\")) == \"null\"),\n",
+					"         \"Invalid flight_id\")\n",
+					"    \n",
+					"    .when(col(\"flight_no\").isNull() | (trim(col(\"flight_no\")) == \"\") | (lower(col(\"flight_no\")) == \"null\"),\n",
+					"         \"Invalid flight_no\")\n",
+					"    \n",
+					"    .when(col(\"departure_time\").isNull() |\n",
+					"          (trim(col(\"departure_time\")) == \"\") |\n",
+					"          (lower(col(\"departure_time\")).isin(\"null\",\"undefined\")) |\n",
+					"          col(\"departure_ts\").isNull(),\n",
+					"         \"Invalid departure_time\")\n",
+					"    \n",
+					"    .when(col(\"arrival_time\").isNull() |\n",
+					"          (trim(col(\"arrival_time\")) == \"\") |\n",
+					"          (lower(col(\"arrival_time\")).isin(\"null\",\"undefined\")) |\n",
+					"          col(\"arrival_ts\").isNull(),\n",
+					"         \"Invalid arrival_time\")\n",
+					")\n",
+					"\n",
+					"# VALID RECORDS (add load_date)\n",
+					"df_valid = df_with_error.filter(col(\"error_reason\").isNull()) \\\n",
+					"                        .drop(\"error_reason\",\"departure_ts\",\"arrival_ts\") \\\n",
+					"                        .withColumn(\"load_date\", current_timestamp())\n",
+					"\n",
+					"# INVALID RECORDS (add load_date + error_reason)\n",
+					"df_invalid = df_with_error.filter(col(\"error_reason\").isNotNull()) \\\n",
+					"                          .drop(\"departure_ts\",\"arrival_ts\") \\\n",
+					"                          .withColumn(\"load_date\", current_timestamp())\n",
+					"\n",
+					"# Write valid records to Silver\n",
+					"df_valid.write \\\n",
+					"    .mode(\"overwrite\") \\\n",
+					"    .format(\"parquet\") \\\n",
+					"    .save(silver_path)\n",
+					"\n",
+					"# Write invalid records to Bronze Error table\n",
+					"df_invalid.write \\\n",
+					"    .mode(\"append\") \\\n",
+					"    .format(\"parquet\") \\\n",
+					"    .save(bronze_error_path)"
+				],
+				"execution_count": 41
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"collapsed": false
+				},
+				"source": [
+					"# display(df_valid)"
+				],
+				"execution_count": 44
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					""
+				]
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					""
 				],
 				"execution_count": null
 			}
