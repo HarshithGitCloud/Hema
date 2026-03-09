@@ -1,0 +1,18 @@
+{
+	"name": "Binary1",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_AdlGen2",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Binary",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"folderPath": "staging/OnPremSQLServer/tempjson",
+				"fileSystem": "adlsgen2"
+			}
+		}
+	}
+}

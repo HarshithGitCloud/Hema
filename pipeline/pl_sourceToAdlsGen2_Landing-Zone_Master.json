@@ -247,8 +247,6 @@
 			{
 				"name": "Delete1",
 				"type": "Delete",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Script1",
@@ -267,15 +265,8 @@
 				"userProperties": [],
 				"typeProperties": {
 					"dataset": {
-						"referenceName": "Json1",
-						"type": "DatasetReference",
-						"parameters": {
-							"Directory": "staging/OnPremSQLServer/tempjson/",
-							"FileName": {
-								"value": ".json",
-								"type": "Expression"
-							}
-						}
+						"referenceName": "Binary1",
+						"type": "DatasetReference"
 					},
 					"logStorageSettings": {
 						"linkedServiceName": {
@@ -287,7 +278,7 @@
 					"storeSettings": {
 						"type": "AzureBlobStorageReadSettings",
 						"recursive": true,
-						"wildcardFileName": ".json",
+						"wildcardFileName": "*.json",
 						"enablePartitionDiscovery": false
 					}
 				}
