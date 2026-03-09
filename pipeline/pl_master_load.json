@@ -13,6 +13,10 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl_sourceToAdlsGen2_Landing-Zone_Master",
+						"type": "PipelineReference"
+					},
 					"waitOnCompletion": true
 				}
 			},
@@ -38,7 +42,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderQuery": "SELECT  * FROM [dbo].[notebookExecutionConfig] where flag = 'True' and source = 'OnPremSQLServer' and layer = 'P'",
+						"sqlReaderQuery": "SELECT  * FROM [dbo].[notebookExecutionConfig] ",
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
