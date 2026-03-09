@@ -1,0 +1,127 @@
+{
+	"name": "nb_clng_raw_PInt_Silver_booking_raw",
+	"properties": {
+		"nbformat": 4,
+		"nbformat_minor": 2,
+		"bigDataPool": {
+			"referenceName": "sparkpool",
+			"type": "BigDataPoolReference"
+		},
+		"sessionProperties": {
+			"driverMemory": "28g",
+			"driverCores": 4,
+			"executorMemory": "28g",
+			"executorCores": 4,
+			"numExecutors": 2,
+			"conf": {
+				"spark.dynamicAllocation.enabled": "false",
+				"spark.dynamicAllocation.minExecutors": "2",
+				"spark.dynamicAllocation.maxExecutors": "2",
+				"spark.autotune.trackingId": "7adcbace-2ef2-4156-9fae-fde623dfbdaf"
+			}
+		},
+		"metadata": {
+			"saveOutput": true,
+			"enableDebugMode": false,
+			"kernelspec": {
+				"name": "synapse_pyspark",
+				"display_name": "Synapse PySpark"
+			},
+			"language_info": {
+				"name": "python"
+			},
+			"a365ComputeOptions": {
+				"id": "/subscriptions/16a3eefe-7a80-4357-b186-6221ffab82f1/resourceGroups/reg_datamart/providers/Microsoft.Synapse/workspaces/synapseanalyticsdevenv/bigDataPools/sparkpool",
+				"name": "sparkpool",
+				"type": "Spark",
+				"endpoint": "https://synapseanalyticsdevenv.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/sparkpool",
+				"auth": {
+					"type": "AAD",
+					"authResource": "https://dev.azuresynapse.net"
+				},
+				"sparkVersion": "3.4",
+				"nodeCount": 10,
+				"cores": 4,
+				"memory": 28,
+				"automaticScaleJobs": false
+			},
+			"sessionKeepAliveTimeout": 30
+		},
+		"cells": [
+			{
+				"cell_type": "code",
+				"source": [
+					"from pyspark.sql.functions import *\n",
+					"from pyspark.sql.types import *\n",
+					"\n",
+					"storage_account = \"sadevenvdatamart\"\n",
+					"container = \"adlsgen2\"\n",
+					"\n",
+					"bronze_path = f\"abfss://{container}@{storage_account}.dfs.core.windows.net/staging/OnPremSQLServer/parquet/bookings_raw.parquet\"\n",
+					"\n",
+					"df = spark.read.parquet(bronze_path)\n",
+					"\n",
+					"display(df)"
+				],
+				"execution_count": 58
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"from pyspark.sql.functions import *\n",
+					"from pyspark.sql.types import *\n",
+					"\n",
+					"# Paths\n",
+					"silver_path = f\"abfss://{container}@{storage_account}.dfs.core.windows.net/preintegration/booking\"\n",
+					"bronze_error_path = f\"abfss://{container}@{storage_account}.dfs.core.windows.net/bronze_error/booking\"\n",
+					"\n",
+					"# Regex patterns\n",
+					"date_regex = r'^(\\d{2}-\\d{2}-\\d{4}|\\d{2}/\\d{2}/\\d{2}|\\d{2} \\w{3} \\d{2}|\\d{4}/\\d{2}/\\d{2})$'\n",
+					"amount_regex = r'^[0-9]+(\\.[0-9]+)?$'\n",
+					"\n",
+					"# Apply DQ checks\n",
+					"df_with_error = df.withColumn(\n",
+					"    \"error_reason\",\n",
+					"    \n",
+					"    when(col(\"booking_id\").isNull() | (trim(col(\"booking_id\")) == \"\") | (lower(col(\"booking_id\")) == \"null\"),\n",
+					"         \"Invalid booking_id\")\n",
+					"    \n",
+					"    .when(col(\"passenger_id\").isNull() | (trim(col(\"passenger_id\")) == \"\") | (lower(col(\"passenger_id\")) == \"null\"),\n",
+					"         \"Invalid passenger_id\")\n",
+					"    \n",
+					"    .when(~regexp_replace(col(\"fare_amount\"), \"[^0-9.]\", \"\").rlike(amount_regex),\n",
+					"         \"Invalid fare_amount format\")\n",
+					"    \n",
+					"    .when(regexp_replace(col(\"fare_amount\"), \"[^0-9.]\", \"\").cast(\"double\") < 0,\n",
+					"         \"fare_amount less than 0\")\n",
+					"    \n",
+					"    .when(~col(\"booking_date\").rlike(date_regex),\n",
+					"         \"Invalid booking_date format\")\n",
+					")\n",
+					"\n",
+					"# Valid records\n",
+					"df_valid = df_with_error.filter(col(\"error_reason\").isNull()) \\\n",
+					"                        .drop(\"error_reason\") \\\n",
+					"                        .withColumn(\"load_date\", current_timestamp())\n",
+					"\n",
+					"# Invalid records\n",
+					"df_invalid = df_with_error.filter(col(\"error_reason\").isNotNull()) \\\n",
+					"                          .withColumn(\"load_date\", current_timestamp())\n",
+					"\n",
+					"# Write Valid → Silver\n",
+					"df_valid.write \\\n",
+					"    .mode(\"overwrite\") \\\n",
+					"    .format(\"parquet\") \\\n",
+					"    .save(silver_path)\n",
+					"\n",
+					"# Write Invalid → Bronze Error\n",
+					"df_invalid.write \\\n",
+					"    .mode(\"append\") \\\n",
+					"    .format(\"parquet\") \\\n",
+					"    .save(bronze_error_path)"
+				],
+				"execution_count": null
+			}
+		]
+	}
+}
