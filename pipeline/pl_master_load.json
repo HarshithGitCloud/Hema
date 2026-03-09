@@ -42,7 +42,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderQuery": "SELECT  * FROM [dbo].[notebookExecutionConfig] ",
+						"sqlReaderQuery": "SELECT  * FROM [dbo].[notebookExecutionConfig]  where notebook_name = 'nb_clng_raw_PInt_Silver_booking_raw'",
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},

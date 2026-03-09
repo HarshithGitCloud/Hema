@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "8a412f40-97e0-4c76-b2a0-81ea7e84f8f7"
+				"spark.autotune.trackingId": "917ee8bc-b934-4bff-8833-ad00854ef11b"
 			}
 		},
 		"metadata": {
@@ -82,9 +82,9 @@
 					"\n",
 					"df = spark.read.parquet(bronze_path)\n",
 					"\n",
-					"display(df)"
+					"# display(df)"
 				],
-				"execution_count": null
+				"execution_count": 81
 			},
 			{
 				"cell_type": "code",
