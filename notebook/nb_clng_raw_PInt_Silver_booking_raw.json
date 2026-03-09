@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "f4afc903-6d35-44aa-8050-f9673b5a4e0e"
+				"spark.autotune.trackingId": "c3c2ec64-12f0-4f5c-9999-c9dad6ca6b74"
 			}
 		},
 		"metadata": {
@@ -50,6 +50,24 @@
 		"cells": [
 			{
 				"cell_type": "code",
+				"source": [
+					"#testing\n",
+					"\n",
+					"storage_account = \"sadevenvdatamart\"\n",
+					"container = \"adlsgen2\"\n",
+					"\n",
+					"source_folder = \"staging/OnPremSQLServer/parquet/flights_raw.parquet\"\n",
+					"\n",
+					"parquet_path = f\"abfss://{container}@{storage_account}.dfs.core.windows.net/{source_folder}\"\n",
+					"\n",
+					"df = spark.read.format(\"parquet\").load(parquet_path)\n",
+					"\n",
+					"df.show() "
+				],
+				"execution_count": 62
+			},
+			{
+				"cell_type": "code",
 				"metadata": {
 					"collapsed": false
 				},
@@ -66,7 +84,7 @@
 					"\n",
 					"display(df)"
 				],
-				"execution_count": 59
+				"execution_count": 60
 			},
 			{
 				"cell_type": "code",

@@ -146,7 +146,7 @@
 				}
 			},
 			{
-				"name": "Lookup1",
+				"name": "Get List Of Stage Tables",
 				"type": "Lookup",
 				"dependsOn": [
 					{
@@ -163,24 +163,7 @@
 					"secureOutput": false,
 					"secureInput": false
 				},
-				"userProperties": [],
-				"typeProperties": {
-					"source": {
-						"type": "AzureSqlSource",
-						"sqlReaderQuery": "SELECT  * FROM [dbo].[notebookExecutionConfig] where flag = 1 and source = 'OnPremSQLServer' and layer = 'P'",
-						"queryTimeout": "02:00:00",
-						"partitionOption": "None"
-					},
-					"dataset": {
-						"referenceName": "AzureSqlTable1",
-						"type": "DatasetReference",
-						"parameters": {
-							"SchemaName": "dbo",
-							"TableName": "notebookExecutionConfig"
-						}
-					},
-					"firstRowOnly": false
-				}
+				"userProperties": []
 			}
 		],
 		"variables": {
