@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "05711856-b36b-4054-99a1-f3c111377e77"
+				"spark.autotune.trackingId": "4cb0da7f-8838-4091-bc4a-fe9f73dc13d1"
 			}
 		},
 		"metadata": {
@@ -233,7 +233,7 @@
 					"df_valid.write.mode(\"overwrite\").format(\"parquet\").save(silver_path)\n",
 					"\n",
 					"# Write invalid records\n",
-					"df_invalid.write.mode(\"append\").format(\"parquet\").save(bronze_error_path)"
+					"df_invalid.write.mode(\"overwrite\").format(\"parquet\").save(bronze_error_path)"
 				],
 				"execution_count": null
 			}

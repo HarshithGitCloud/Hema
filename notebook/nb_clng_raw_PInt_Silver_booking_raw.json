@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "de6bfb97-7953-467f-a9d4-eb2cc4fcae9d"
+				"spark.autotune.trackingId": "908adc83-ab88-46bc-adb5-4720749267bb"
 			}
 		},
 		"metadata": {
@@ -137,7 +137,7 @@
 					"\n",
 					"# Write Invalid → Bronze Error\n",
 					"df_invalid.write \\\n",
-					"    .mode(\"append\") \\\n",
+					"    .mode(\"overwrite\") \\\n",
 					"    .format(\"parquet\") \\\n",
 					"    .save(bronze_error_path)"
 				],
