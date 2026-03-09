@@ -1,0 +1,730 @@
+{
+	"name": "PL_Time_P360_Data_Load_Ingestion",
+	"properties": {
+		"activities": [
+			{
+				"name": "StartTime",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "StartTime",
+					"value": {
+						"value": "@convertTimeZone(utcNow(), 'UTC', 'Eastern Standard Time')",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "SRP_Raw_Layer",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "StartTime",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl_sourceToAdlsGen2_Landing-Zone_Master",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
+			},
+			{
+				"name": "Time_PreIntegration_Pipeline",
+				"description": "Here we will be transformation using notebooks for raw to pre intigration",
+				"type": "ExecutePipeline",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
+				"dependsOn": [
+					{
+						"activity": "SRP_Raw_Layer",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"waitOnCompletion": true
+				}
+			},
+			{
+				"name": "Get LIST OF STAGE TABLE",
+				"type": "Lookup",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
+				"dependsOn": [
+					{
+						"activity": "Time_PreIntegration_Pipeline",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "SqlServerSource",
+						"sqlReaderQuery": "SELECT * FROM dbo.MergeConfig where SourceDomain = 'Time' and id = 2",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "STAGE TABLE CREATION",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "Get LIST OF STAGE TABLE",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Get LIST OF STAGE TABLE').output.value",
+						"type": "Expression"
+					},
+					"isSequential": true,
+					"activities": [
+						{
+							"name": "Script1_copy1",
+							"type": "Script",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"scripts": [
+									{
+										"type": "Query",
+										"text": {
+											"value": "@item().SourceTableDDL",
+											"type": "Expression"
+										}
+									}
+								],
+								"scriptBlockExecutionTimeout": "02:00:00"
+							}
+						},
+						{
+							"name": "Set variable1",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "Script1_copy1",
+									"dependencyConditions": [
+										"Failed"
+									]
+								}
+							],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "varerror",
+								"value": {
+									"value": "@concat('Item: ', string(item()), ' - Error: ', activity('Script1_copy1').error.message)",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "Fail",
+							"type": "Fail",
+							"dependsOn": [
+								{
+									"activity": "Set variable1",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"userProperties": [],
+							"typeProperties": {
+								"message": "PipeLineFailed",
+								"errorCode": "400"
+							}
+						}
+					]
+				}
+			},
+			{
+				"name": "SRP_Integration_Pipeline",
+				"type": "ExecutePipeline",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
+				"dependsOn": [
+					{
+						"activity": "STAGE TABLE CREATION",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"waitOnCompletion": true
+				}
+			},
+			{
+				"name": "Lookup ConfigTable",
+				"type": "Lookup",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
+				"dependsOn": [
+					{
+						"activity": "SRP_Integration_Pipeline",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "SqlServerSource",
+						"sqlReaderQuery": "SELECT * FROM  dbo.ConfigFileMapping where Active = 1 AND SourceDomain = 'Time' and islink_Table = 0 and isparallel = 1",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "CREATE PAQUET TO ADLS",
+				"type": "ForEach",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
+				"dependsOn": [
+					{
+						"activity": "Lookup ConfigTable",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Lookup ConfigTable').output.value",
+						"type": "Expression"
+					},
+					"isSequential": true,
+					"activities": [
+						{
+							"name": "Copy data1",
+							"type": "Copy",
+							"state": "Inactive",
+							"onInactiveMarkAs": "Succeeded",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "ParquetSource",
+									"storeSettings": {
+										"type": "AzureBlobFSReadSettings",
+										"recursive": true,
+										"wildcardFolderPath": {
+											"value": "@item().FilePath",
+											"type": "Expression"
+										},
+										"wildcardFileName": {
+											"value": "@concat(item().FileNamePrefix,'*')",
+											"type": "Expression"
+										},
+										"enablePartitionDiscovery": false
+									},
+									"formatSettings": {
+										"type": "ParquetReadSettings"
+									}
+								},
+								"sink": {
+									"type": "SqlServerSink",
+									"writeBehavior": "insert",
+									"sqlWriterUseTableLock": false
+								},
+								"enableStaging": false
+							}
+						},
+						{
+							"name": "Script1",
+							"type": "Script",
+							"state": "Inactive",
+							"onInactiveMarkAs": "Failed",
+							"dependsOn": [
+								{
+									"activity": "Copy data1",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"scripts": [
+									{
+										"type": "Query",
+										"text": {
+											"value": "@item().ClusterCol",
+											"type": "Expression"
+										}
+									}
+								],
+								"scriptBlockExecutionTimeout": "02:00:00"
+							}
+						},
+						{
+							"name": "Set variable2",
+							"type": "SetVariable",
+							"state": "Inactive",
+							"onInactiveMarkAs": "Succeeded",
+							"dependsOn": [
+								{
+									"activity": "Copy data1",
+									"dependencyConditions": [
+										"Failed"
+									]
+								},
+								{
+									"activity": "Script1",
+									"dependencyConditions": [
+										"Failed"
+									]
+								}
+							],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "varerror2",
+								"value": {
+									"value": "@concat('Item: ', string(item()), ' - Error: ', activity('Copy data1').error.message)",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "Fail1",
+							"type": "Fail",
+							"state": "Inactive",
+							"onInactiveMarkAs": "Succeeded",
+							"dependsOn": [
+								{
+									"activity": "Set variable2",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"userProperties": [],
+							"typeProperties": {
+								"message": "varerror2",
+								"errorCode": "400"
+							}
+						}
+					]
+				}
+			},
+			{
+				"name": "GETTING SYNCUP SCRIPT",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "CREATE PAQUET TO ADLS",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "SqlServerSource",
+						"sqlReaderQuery": "select * from [dbo].[MergeConfig] WHERE SourceDomain = 'Time' AND ACTIVE = 1 and islink_Table = 0   and  isparallel = 1 order by SEQUENCE_Order asc",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "UPDATE GOLDEN LAYER",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "GETTING SYNCUP SCRIPT",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('GETTING SYNCUP SCRIPT').output.value",
+						"type": "Expression"
+					},
+					"isSequential": true,
+					"activities": [
+						{
+							"name": "UpsertToSQLMI",
+							"type": "Script",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"scripts": [
+									{
+										"type": "Query",
+										"text": {
+											"value": "@item().MergeSQL",
+											"type": "Expression"
+										}
+									}
+								],
+								"scriptBlockExecutionTimeout": "02:00:00"
+							}
+						},
+						{
+							"name": "Set_variable_For_Error",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "UpsertToSQLMI",
+									"dependencyConditions": [
+										"Failed"
+									]
+								}
+							],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "varerror3",
+								"value": {
+									"value": "@concat('Item: ', string(item()), ' - Error: ', activity('UpsertToSQLMI').error.message)",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "Fail_PL",
+							"type": "Fail",
+							"dependsOn": [
+								{
+									"activity": "Set_variable_For_Error",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"userProperties": [],
+							"typeProperties": {
+								"message": "PipeLineFailed",
+								"errorCode": "400"
+							}
+						}
+					]
+				}
+			},
+			{
+				"name": "Drop Table STAGE TABLE",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "UPDATE GOLDEN LAYER",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "SqlServerSource",
+						"sqlReaderQuery": "select * from [dbo].[MergeConfig] WHERE SourceDomain = 'Time' AND ACTIVE = 1 and islink_Table = 0",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "Drop STAGE Table in Loop",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "Drop Table STAGE TABLE",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Drop Table STAGE TABLE').output.value",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "Drop table Script",
+							"type": "Script",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"scripts": [
+									{
+										"type": "Query",
+										"text": {
+											"value": "@concat('DROP TABLE [', item().TableSchema, '].[', item().DelSourceTable, '];')",
+											"type": "Expression"
+										}
+									}
+								],
+								"scriptBlockExecutionTimeout": "02:00:00"
+							}
+						},
+						{
+							"name": "Set variable3",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "Drop table Script",
+									"dependencyConditions": [
+										"Failed"
+									]
+								}
+							],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "varerror4",
+								"value": {
+									"value": "@concat('Item: ', string(item()), ' - Error: ', activity('Drop table Script').error.message)",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "Fail2",
+							"type": "Fail",
+							"dependsOn": [
+								{
+									"activity": "Set variable3",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"userProperties": [],
+							"typeProperties": {
+								"message": "PipelineFailed",
+								"errorCode": "400"
+							}
+						}
+					]
+				}
+			},
+			{
+				"name": "LinkQueryUpdate",
+				"type": "ExecutePipeline",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
+				"dependsOn": [
+					{
+						"activity": "Drop STAGE Table in Loop",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"waitOnCompletion": true
+				}
+			},
+			{
+				"name": "Logs Success Stored procedure",
+				"type": "SqlServerStoredProcedure",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
+				"dependsOn": [
+					{
+						"activity": "LinkQueryUpdate",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": []
+			},
+			{
+				"name": "Logs Failure Stored procedure",
+				"type": "SqlServerStoredProcedure",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
+				"dependsOn": [
+					{
+						"activity": "LinkQueryUpdate",
+						"dependencyConditions": [
+							"Failed",
+							"Skipped"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": []
+			},
+			{
+				"name": "Email Alert",
+				"type": "SqlServerStoredProcedure",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
+				"dependsOn": [
+					{
+						"activity": "Logs Failure Stored procedure",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": []
+			}
+		],
+		"variables": {
+			"StartTime": {
+				"type": "String"
+			},
+			"varerror": {
+				"type": "String"
+			},
+			"varerror2": {
+				"type": "String"
+			},
+			"varerror3": {
+				"type": "String"
+			},
+			"varerror4": {
+				"type": "String"
+			}
+		},
+		"annotations": []
+	}
+}
