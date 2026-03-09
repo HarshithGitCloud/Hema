@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "bd3790e3-5daa-4172-a3d3-417227eec33a"
+				"spark.autotune.trackingId": "c8486c4e-1f86-40b6-be22-7b42391f2fab"
 			}
 		},
 		"metadata": {
@@ -51,20 +51,20 @@
 			{
 				"cell_type": "code",
 				"source": [
-					"#testing\n",
+					"# #testing\n",
 					"\n",
-					"storage_account = \"sadevenvdatamart\"\n",
-					"container = \"adlsgen2\"\n",
+					"# storage_account = \"sadevenvdatamart\"\n",
+					"# container = \"adlsgen2\"\n",
 					"\n",
-					"source_folder = \"staging/OnPremSQLServer/parquet/flights_raw.parquet\"\n",
+					"# source_folder = \"staging/OnPremSQLServer/parquet/flights_raw.parquet\"\n",
 					"\n",
-					"parquet_path = f\"abfss://{container}@{storage_account}.dfs.core.windows.net/{source_folder}\"\n",
+					"# parquet_path = f\"abfss://{container}@{storage_account}.dfs.core.windows.net/{source_folder}\"\n",
 					"\n",
-					"df = spark.read.format(\"parquet\").load(parquet_path)\n",
+					"# df = spark.read.format(\"parquet\").load(parquet_path)\n",
 					"\n",
-					"df.show() "
+					"# df.show() "
 				],
-				"execution_count": 63
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
