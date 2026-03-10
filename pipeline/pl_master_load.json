@@ -126,7 +126,7 @@
 							"typeProperties": {
 								"variableName": "Var_PreIntigration",
 								"value": {
-									"value": "@concat('item: ',string(item()), '-Error: ',activity('GetPreintigration').error.message)",
+									"value": "concat('item: ', string(item()), ' - Error: ', activity('GetPreintigration')?.error?.message)",
 									"type": "Expression"
 								}
 							}
