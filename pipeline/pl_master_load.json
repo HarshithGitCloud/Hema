@@ -97,14 +97,14 @@
 								},
 								"snapshot": true,
 								"sparkPool": {
-									"referenceName": "sparkpool",
+									"referenceName": "newpool",
 									"type": "BigDataPoolReference"
 								},
-								"executorSize": "Small",
+								"executorSize": "Large",
 								"conf": {
 									"spark.dynamicAllocation.enabled": true
 								},
-								"driverSize": "Small"
+								"driverSize": "Large"
 							}
 						},
 						{
