@@ -97,6 +97,10 @@
 									"type": "NotebookReference"
 								},
 								"snapshot": true,
+								"sparkPool": {
+									"referenceName": "newpool",
+									"type": "BigDataPoolReference"
+								},
 								"executorSize": "Large",
 								"conf": {
 									"spark.dynamicAllocation.enabled": true
