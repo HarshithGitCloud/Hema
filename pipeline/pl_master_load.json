@@ -100,11 +100,11 @@
 									"referenceName": "newpool",
 									"type": "BigDataPoolReference"
 								},
-								"executorSize": "Large",
+								"executorSize": "Small",
 								"conf": {
 									"spark.dynamicAllocation.enabled": true
 								},
-								"driverSize": "Large"
+								"driverSize": "Small"
 							}
 						},
 						{
