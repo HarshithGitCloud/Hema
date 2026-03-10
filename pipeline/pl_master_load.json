@@ -97,7 +97,10 @@
 								},
 								"snapshot": true,
 								"sparkPool": {
-									"referenceName": "newpool",
+									"referenceName": {
+										"value": "@item().notebook_name",
+										"type": "Expression"
+									},
 									"type": "BigDataPoolReference"
 								},
 								"executorSize": "Small",
