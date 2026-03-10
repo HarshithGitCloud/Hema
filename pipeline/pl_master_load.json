@@ -90,7 +90,7 @@
 							"typeProperties": {
 								"notebook": {
 									"referenceName": {
-										"value": "@trim(item().notebook_name)",
+										"value": "@item().notebook_name",
 										"type": "Expression"
 									},
 									"type": "NotebookReference"
