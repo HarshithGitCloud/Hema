@@ -1,0 +1,51 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"workspaceName": {
+			"value": "flightproject"
+		},
+		"flightproject-WorkspaceDefaultSqlServer_connectionString": {
+			"value": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=tcp:flightproject.sql.azuresynapse.net,1433;Initial Catalog=@{linkedService().DBName}"
+		},
+		"ls_AdlGen2_accountKey": {
+			"value": ""
+		},
+		"ls_azureSqlDB_password": {
+			"value": ""
+		},
+		"ls_project_password": {
+			"value": ""
+		},
+		"synapseanalyticsdevenv-WorkspaceDefaultSqlServer_connectionString": {
+			"value": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=tcp:synapseanalyticsdevenv.sql.azuresynapse.net,1433;Initial Catalog=@{linkedService().DBName}"
+		},
+		"flightproject-WorkspaceDefaultStorage_properties_typeProperties_url": {
+			"value": "https://adfflightproject.dfs.core.windows.net"
+		},
+		"ls_AdlGen2_properties_typeProperties_url": {
+			"value": "https://sadevenvdatamart.dfs.core.windows.net/"
+		},
+		"ls_azureSqlDB_properties_typeProperties_server": {
+			"value": "sqlserver-datahub.database.windows.net"
+		},
+		"ls_azureSqlDB_properties_typeProperties_database": {
+			"value": "sqldb"
+		},
+		"ls_azureSqlDB_properties_typeProperties_userName": {
+			"value": "sqladmin-datahub"
+		},
+		"ls_project_properties_typeProperties_server": {
+			"value": "harshith.database.windows.net"
+		},
+		"ls_project_properties_typeProperties_database": {
+			"value": "db_flight_march_03_2026"
+		},
+		"ls_project_properties_typeProperties_userName": {
+			"value": "Harshith"
+		},
+		"synapseanalyticsdevenv-WorkspaceDefaultStorage_properties_typeProperties_url": {
+			"value": "https://sadevenvdatamart.dfs.core.windows.net"
+		}
+	}
+}
