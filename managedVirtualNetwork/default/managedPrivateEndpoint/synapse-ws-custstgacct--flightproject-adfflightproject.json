@@ -1,0 +1,7 @@
+{
+	"name": "synapse-ws-custstgacct--flightproject-adfflightproject",
+	"properties": {
+		"privateLinkResourceId": "/subscriptions/887d3f02-cb02-4341-9c1b-784648fc8f6d/resourceGroups/Adf_harshi/providers/Microsoft.Storage/storageAccounts/adfflightproject",
+		"groupId": "dfs"
+	}
+}
