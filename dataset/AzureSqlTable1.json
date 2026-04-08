@@ -1,0 +1,67 @@
+{
+	"name": "AzureSqlTable1",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureSqlDatabase1",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "MetadataID",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "SourceName",
+				"type": "nvarchar"
+			},
+			{
+				"name": "SourceSchemaName",
+				"type": "nvarchar"
+			},
+			{
+				"name": "SourceTableName",
+				"type": "nvarchar"
+			},
+			{
+				"name": "SourceQuery",
+				"type": "nvarchar"
+			},
+			{
+				"name": "WatermarkColumnName",
+				"type": "nvarchar"
+			},
+			{
+				"name": "LastWatermarkValue",
+				"type": "nvarchar"
+			},
+			{
+				"name": "WatermarkDataType",
+				"type": "nvarchar"
+			},
+			{
+				"name": "IsActive",
+				"type": "bit"
+			},
+			{
+				"name": "SourceServer",
+				"type": "nvarchar"
+			},
+			{
+				"name": "SourceDatabaseName",
+				"type": "nvarchar"
+			},
+			{
+				"name": "SourceDBUserName",
+				"type": "nvarchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "IncrementalLoadMetadata"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}
