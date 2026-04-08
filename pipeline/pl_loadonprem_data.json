@@ -150,7 +150,10 @@
 										"outputs": [
 											{
 												"referenceName": "ls_sink",
-												"type": "DatasetReference"
+												"type": "DatasetReference",
+												"parameters": {
+													"Tablename": "@concat('Select * from ' ,item().Source_Object_Schema,'.',item().Source_Object_Name,' where ',item().watermark_column,'>',item().watermark_value)"
+												}
 											}
 										]
 									}
