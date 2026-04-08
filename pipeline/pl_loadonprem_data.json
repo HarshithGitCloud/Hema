@@ -88,10 +88,6 @@
 													"schemaname": {
 														"value": "@item().Source_Object_Schema",
 														"type": "Expression"
-													},
-													"tablename": {
-														"value": "@concat(item().Source_Object_Name,'.csv')",
-														"type": "Expression"
 													}
 												}
 											}
