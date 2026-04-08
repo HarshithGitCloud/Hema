@@ -110,7 +110,13 @@
 										"inputs": [
 											{
 												"referenceName": "AzureSqlTable1",
-												"type": "DatasetReference"
+												"type": "DatasetReference",
+												"parameters": {
+													"schemaname": {
+														"value": "@item().Source_Object_Schema",
+														"type": "Expression"
+													}
+												}
 											}
 										]
 									}
