@@ -1,0 +1,23 @@
+{
+	"name": "SqlServerTable1",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ds_Dynamic_copy_allTAbles",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"ServerName": {
+				"type": "string"
+			},
+			"SourceDataBaseName": {
+				"type": "string"
+			},
+			"SourceDBUserName": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "SqlServerTable",
+		"schema": []
+	}
+}
