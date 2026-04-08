@@ -114,7 +114,17 @@
 										"outputs": [
 											{
 												"referenceName": "ls_sink",
-												"type": "DatasetReference"
+												"type": "DatasetReference",
+												"parameters": {
+													"Schema": {
+														"value": "@item().Source_Object_Schema",
+														"type": "Expression"
+													},
+													"Tablename": {
+														"value": "@concat(item().Source_Object_Name,'.csv')",
+														"type": "Expression"
+													}
+												}
 											}
 										]
 									}
