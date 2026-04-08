@@ -51,6 +51,10 @@
 							"dependsOn": [],
 							"userProperties": [],
 							"typeProperties": {
+								"expression": {
+									"value": "@equals(item().Load_Type,'increment')",
+									"type": "Expression"
+								},
 								"ifTrueActivities": [
 									{
 										"name": "Lookup2",
