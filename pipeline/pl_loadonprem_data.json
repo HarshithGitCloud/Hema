@@ -25,7 +25,8 @@
 						"referenceName": "AzureSqlTable1",
 						"type": "DatasetReference",
 						"parameters": {
-							"schemaname": "Source_Object_Schema"
+							"schemaname": "Source_Object_Schema",
+							"tablename": "Source_Object_Name"
 						}
 					},
 					"firstRowOnly": false
