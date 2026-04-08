@@ -108,6 +108,10 @@
 													"schemaname": {
 														"value": "@item().Source_Object_Schema",
 														"type": "Expression"
+													},
+													"tablename": {
+														"value": "@item().Source_Object_Name",
+														"type": "Expression"
 													}
 												}
 											}
