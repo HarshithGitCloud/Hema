@@ -22,7 +22,17 @@
 					},
 					"dataset": {
 						"referenceName": "AzureSqlTable1",
-						"type": "DatasetReference"
+						"type": "DatasetReference",
+						"parameters": {
+							"schemaname": {
+								"value": "Source_Object_Schema",
+								"type": "Expression"
+							},
+							"tablename": {
+								"value": "Source_Object_Name",
+								"type": "Expression"
+							}
+						}
 					}
 				}
 			}
