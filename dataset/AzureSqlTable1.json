@@ -67,8 +67,14 @@
 			}
 		],
 		"typeProperties": {
-			"schema": "dbo",
-			"table": "controltable"
+			"schema": {
+				"value": "@dataset().schemaname",
+				"type": "Expression"
+			},
+			"table": {
+				"value": "@dataset().tablename",
+				"type": "Expression"
+			}
 		}
 	},
 	"type": "Microsoft.DataFactory/factories/datasets"

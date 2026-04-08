@@ -1,6 +1,37 @@
 {
 	"name": "pipeline1",
 	"properties": {
+		"activities": [
+			{
+				"name": "GetMetaData",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": "SELECT \n    SourceSchemaName,\n    SourceTableName,\n    ISNULL(SourceQuery,'') +\n    '''' +\n    ISNULL(\n        CASE \n            WHEN WatermarkDataType = 'DATETIME'\n                THEN ISNULL(NULLIF(LastWatermarkValue,'NULL'),'01/01/1900')\n            WHEN WatermarkDataType = 'INT'\n                THEN ISNULL(NULLIF(LastWatermarkValue,'NULL'),\n                     UPPER(LEFT(WatermarkColumnName,1)) + '0')\n            ELSE ISNULL(NULLIF(LastWatermarkValue,'NULL'),'')\n        END,''\n    )\n    + '''' AS SourceQuery,\n    SourceName,\n    SourceServer,\n    SourceDatabaseName,\n    SourceDBUserName\nFROM IncrementalLoadMetadata\nWHERE IsActive = 1;",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "AzureSqlTable1",
+						"type": "DatasetReference",
+						"parameters": {
+							"schemaname": "dbo",
+							"tablename": "IncrementalLoadMeta"
+						}
+					}
+				}
+			}
+		],
 		"annotations": []
 	}
 }
