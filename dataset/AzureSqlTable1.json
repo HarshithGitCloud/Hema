@@ -60,7 +60,7 @@
 		],
 		"typeProperties": {
 			"schema": "dbo",
-			"table": "IncrementalLoadMetadata"
+			"table": "controltable"
 		}
 	},
 	"type": "Microsoft.DataFactory/factories/datasets"
